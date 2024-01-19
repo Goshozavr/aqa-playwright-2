@@ -9,20 +9,20 @@ test.describe("New user registration", () => {
     await page.goto("/");
   });
 
-  test("Open login form", async () => {
+  test.beforeEach("Open login form", async () => {
     const loginButton = page.locator("button", {
       hasText: "Sign in",
     });
 
-    await loginButton.click("log in form should opens");
+    await loginButton.click();
   });
 
-  test("Open registration form", async () => {
+  test.beforeEach("Open registration form", async () => {
     const regBtn = page.locator("button", {
       hasText: "Registration",
     });
 
-    await regBtn.click("registration form should opens");
+    await regBtn.click();
   });
 
   test("regiter button disabled/All input are empty", async () => {
