@@ -13,17 +13,17 @@ test.describe("New user registration", () => {
     const loginButton = page.locator("button", {
       hasText: "Sign in",
     });
-
-    await loginButton.click();
-  });
-
-  test.beforeEach("Open registration form", async () => {
     const regBtn = page.locator("button", {
       hasText: "Registration",
     });
 
+    await loginButton.click();
     await regBtn.click();
   });
+
+  //test.beforeEach("Open registration form", async () => {
+
+  //});
 
   test("regiter button disabled/All input are empty", async () => {
     const registerBtn = page.locator("button", {
