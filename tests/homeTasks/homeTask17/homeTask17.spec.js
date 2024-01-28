@@ -5,24 +5,6 @@ test.describe("New user registration", () => {
   let page;
   let welcomePage;
 
-  /*test.beforeAll(async ({ browser }) => {
-    const ctx = await browser.newContext();
-    page = await ctx.newPage();
-    await page.goto("/");
-  });
-
-  test.beforeEach("Open login form", async () => {
-    const loginButton = page.locator("button", {
-      hasText: "Sign in",
-    });
-    const regBtn = page.locator("button", {
-      hasText: "Registration",
-    });
-
-    await loginButton.click();
-    await regBtn.click();
-  });*/
-
   test.beforeEach(async ({ browser }) => {
     page = await browser.newPage();
     welcomePage = new WelcomePage(page);
@@ -31,7 +13,6 @@ test.describe("New user registration", () => {
 
   test("register button disabled/All input are empty", async () => {
     const registrationPopup = await welcomePage.clickSignUpBtn();
-
     await expect(registrationPopup.registerBtn).toBeDisabled();
   });
 
