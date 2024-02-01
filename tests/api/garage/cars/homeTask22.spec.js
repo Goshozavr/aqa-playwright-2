@@ -2,6 +2,7 @@ import axios from "axios";
 import { USERS } from "../../../src/data/users";
 import { test, expect } from "@playwright/test";
 import { wrapper } from "axios-cookiejar-support";
+import { CookieJar } from "tough-cookie";
 import { negativeFixture } from "./fixtures/createCar.fixtures";
 
 test.describe("Cars", () => {
