@@ -32,7 +32,7 @@ const config = defineConfig({
     trace: "on-first-retry",
     actionTimeout: 6000,
     headless: false,
-    HTTPCredentials: testConfig.httpCredentials,
+    httpCredentials: testConfig.httpCredentials,
     /*{
       username: process.env.HTTP_CREDENTIALS_USERNAME, //"guest",
       password: process.env.HTTP_CREDENTIALS_PASSWORD, //"welcome2qauto",
@@ -54,8 +54,12 @@ const config = defineConfig({
       use: { ...devices["Desktop Chrome"] },
       dependencies: ["global-setup"],
       teardown: "global-teardown",
+      testMatch: "/tests/e2e/**/*.spec.js",
     },
-
+    {
+      name: "API tests",
+      testMatch: "/tests/api/**/*spec.js",
+    },
     /*{
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
