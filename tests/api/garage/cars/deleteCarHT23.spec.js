@@ -24,6 +24,8 @@ test.describe("Delete request", () => {
 
   test("Delete car", async () => {
     const deleteCar = await client.carController.deleteCarById(carId);
+    const getCar = await client.carController.getUserCarById(carId);
     expect(deleteCar.status).toBe(200);
+    expect(getCar.status).toBe(404);
   });
 });

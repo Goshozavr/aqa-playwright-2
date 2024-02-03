@@ -7,7 +7,6 @@ import { CAR_MODELS } from "../../../src/data/dict/carModels";
 test.describe.only("Delete request", () => {
   let client;
   let carId;
-  let carBody;
   let brandId;
   let modelId;
   let initMiliage;
@@ -16,7 +15,6 @@ test.describe.only("Delete request", () => {
   let brandName;
   let modelName;
   let logoName;
-
   test.beforeAll(async () => {
     client = await APIClient.authenticate(
       USERS.BYVALIJ.email,
@@ -27,16 +25,28 @@ test.describe.only("Delete request", () => {
       carModelId: CAR_MODELS.AUDI.Q7.id,
       mileage: 11,
     });
-    carBody = createCarResponse.data.data;
-    carId = createCarResponse.data.data.id;
-    brandId = createCarResponse.data.data.carBrandId;
-    modelId = createCarResponse.data.data.carModelId;
-    initMiliage = createCarResponse.data.data.initMiliage;
-    updatedMilAt = Date.now();
-    carCreAt = createCarResponse.data.data.carCreatedAt;
-    brandName = createCarResponse.data.data.brand;
-    modelName = createCarResponse.data.data.model;
-    logoName = createCarResponse.data.data.logo;
+
+    [
+      carId,
+      brandId,
+      modelId,
+      initMiliage,
+      updatedMilAt,
+      carCreAt,
+      brandName,
+      modelName,
+      logoName,
+    ] = [
+      createCarResponse.data.data.id,
+      createCarResponse.data.data.carBrandId,
+      createCarResponse.data.data.carModelId,
+      createCarResponse.data.data.initMiliage,
+      Date.now(),
+      createCarResponse.data.data.carCreatedAt,
+      createCarResponse.data.data.brand,
+      createCarResponse.data.data.model,
+      createCarResponse.data.data.logo,
+    ];
   });
 
   test("Edit car", async () => {
@@ -52,7 +62,8 @@ test.describe.only("Delete request", () => {
       model: modelName,
       logo: logoName,
     });
-    console.log(editCar);
+    const getCar = await client.carController.getUserCarById(carId);
     expect(editCar.status).toBe(200);
+    expect(getCar.data.data.mileage).toEqual(editCar.data.data.mileage);
   });
 });

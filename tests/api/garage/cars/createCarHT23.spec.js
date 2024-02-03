@@ -6,7 +6,7 @@ import { CAR_MODELS } from "../../../src/data/dict/carModels";
 
 test.describe("Create car", () => {
   let client;
-
+  let carId;
   let brands;
   test("Create car", async () => {
     client = await APIClient.authenticate(USERS.POP.email, USERS.POP.password);
@@ -17,19 +17,18 @@ test.describe("Create car", () => {
       carModelId: CAR_MODELS.AUDI.A6.id,
       mileage: Math.floor(Math.random() * 100),
     });
+
+    carId = createCarResponse.data.data.id;
     expect(createCarResponse.status).toBe(201);
-    //carId = createCarResponse.data.data.id;
+    expect(createCarResponse.data.data).toMatchObject({
+      id: carId,
+      carBrandId: createCarResponse.data.data.carBrandId,
+      carModelId: createCarResponse.data.data.carModelId,
+      initialMileage: createCarResponse.data.data.mileage,
+      mileage: createCarResponse.data.data.mileage,
+      brand: createCarResponse.data.data.brand,
+      model: createCarResponse.data.data.model,
+      logo: createCarResponse.data.data.logo,
+    });
   });
-  /*test("Get car by id", async (id)=> {
-        const response = await client.carController.getUserCarById(id)
-        expect(response.status).toBe(200)
-      })*/
-  /*test.afterAll(async () => {
-          const userCars = await client.carController.getUserCars();
-          await Promise.all(
-            userCars.data.data.map((car) =>
-              client.carController.deleteCarById(car.id)
-            )
-          );
-        });*/
 });
