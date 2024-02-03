@@ -40,7 +40,7 @@ test.describe("Cars", () => {
         carId = await createCar(); //для дз можливо треба буде винести створення машини в біфор іч
       });
 
-      test.only("Delete car", async () => {
+      test("Delete car", async () => {
         await test.step("Delete car", async () => {
           const response = await client.delete(`/cars/${carId}`);
           expect(response.status, "Status should be valid").toBe(200);

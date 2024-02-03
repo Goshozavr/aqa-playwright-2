@@ -27,7 +27,7 @@ test.describe("Cars", () => {
       );
 
       async function createCar(requestData) {
-        const createCarResponse = await axios.post("/cars", requestData);
+        const createCarResponse = await client.post("/cars", requestData);
         return createCarResponse.data.data.id;
       }
 
@@ -44,7 +44,7 @@ test.describe("Cars", () => {
         await client.delete(`/cars/${car.id}`);
       });
 
-      test.only("Get car by id", async () => {
+      test("Get car by id", async () => {
         const startTime = Date.now();
         const response = await client.get(`/cars/${carId}`);
         expect(response.status, "Status should be valid").toBe(200);
@@ -66,3 +66,6 @@ test.describe("Cars", () => {
     });
   });
 });
+
+//контроллери - це класи, які в собі інкапсулюють логіку запитів
+//вони пишуться щоб прибрати дублювання коду та зробити тести більш читабельними
