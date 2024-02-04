@@ -4,9 +4,9 @@ import { test, expect } from "@playwright/test";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { negativeFixture } from "./fixtures/createCar.fixtures";
+import APIClient from "../../../src/client/APIClient";
 
 test.describe("Cars", () => {
-  // спосіб з витягуванням хедерів вручну
   test.describe("Create", () => {
     test.describe("Positive case use header", () => {
       let client = axios.create({
@@ -19,15 +19,14 @@ test.describe("Cars", () => {
           password: USERS.POP.password,
           remember: false,
         });
-        console.log(signInResponse); // тут виведеться кука, яка повертається після логіна
+        console.log(signInResponse);
         const cookie = signInResponse.headers["set-cookie"][0].split(";")[0];
         client = axios.create({
           baseURL: "https://qauto.forstudy.space/api",
           headers: {
             cookie,
-            // 'authorisation': `Bearer ${token}`
           },
-        }); // якщо авторизація через беарер - так само дістаємо його з тіла запиту
+        });
 
         const response = await axios.get("/cars/brands");
         brands = response.data.data;
@@ -38,8 +37,6 @@ test.describe("Cars", () => {
           userCars.data.data.map((car) => client.delete(`/cars/${car.id}`))
         );
       });
-
-      // - параметризований тест
 
       test(`Create car`, async () => {
         for (const brand of brands) {
@@ -72,46 +69,33 @@ test.describe("Cars", () => {
     });
   });
 });
-// axios-cookiejar -ця бібліотека надає змогу створити джар об'єкт, передати його та зберегти в інстансі і,
-//якщо був логін, то він збереже ці кукі і більше не треба робити цю мануальну роботу,
-//з кожним запитом кукі будуть оновлюватися
 test.describe("Cars", () => {
   test.describe("Create", () => {
     test.describe("Positive case", () => {
-      const jar = new CookieJar();
-      let client = wrapper(
-        axios.create({
-          baseURL: "https://qauto.forstudy.space/api",
-          jar,
-        })
-      );
+      let client;
+
       let brands;
       test.beforeAll(async () => {
-        await client.post("/auth/signin", {
-          // куки, які викликаються тут - збурежуться в джар об'єкт
-          email: USERS.POP.email,
-          password: USERS.POP.password,
-          remember: false,
-        });
-
-        const response = await axios.get("/cars/brands");
+        client = await APIClient.authenticate(
+          USERS.POP.email,
+          USERS.POP.password
+        );
+        const response = await client.carController.getBrands();
         brands = response.data.data;
       });
       test.afterAll(async () => {
-        const userCars = await client.get("/cars");
+        const userCars = await client.carController.getUserCars();
         await Promise.all(
-          userCars.data.data.map((car) => client.delete(`/cars/${car.id}`))
+          userCars.data.data.map((car) =>
+            client.carController.deleteCarById(car.id)
+          )
         );
       });
-
-      // - параметризований тест
-
       test("Create car", async () => {
         for (const brand of brands) {
           await test.step(`Create car brand ${brand.title}`, async () => {
-            const modelsResponse = await axios.get(
-              `/cars/models?carBrandId=${brand.id}`
-            );
+            const modelsResponse =
+              await client.carController.getModelsByBrandId(brand.id);
             const models = modelsResponse.data.data;
 
             for (const model of models) {
@@ -121,12 +105,11 @@ test.describe("Cars", () => {
                   carModelId: model.id,
                   mileage: Math.floor(Math.random() * 100),
                 };
-                const createCarResponse = await axios.post(
-                  "/cars",
+                const createCarResponse = await client.carController.createCar(
                   createCarReqBody
                 );
                 expect(
-                  createCarReqBody.status,
+                  createCarResponse.status,
                   "Status code should be valid"
                 ).toBe(201);
               });
@@ -152,7 +135,6 @@ test.describe("Cars", () => {
       let brands;
       test.beforeAll(async () => {
         await client.post("/auth/signin", {
-          // куки, які викликаються тут - збурежуться в джар об'єкт
           email: USERS.POP.email,
           password: USERS.POP.password,
           remember: false,
@@ -180,7 +162,6 @@ test.describe("Cars", () => {
         expect(createCarReqBody.status, "Status code should be valid").toBe(
           400
         );
-        //console.log(createCarResponse.data);// - тут отримаємо очікуваний текст ерору
         expect(createCarResponse.data, "Response body should be valid").toEqual(
           { status: "error", message: "Mileage is required" }
         );
@@ -205,7 +186,6 @@ test.describe("Cars", () => {
         expect(createCarReqBody.status, "Status code should be valid").toBe(
           400
         );
-        //console.log(createCarResponse.data);// - тут отримаємо очікуваний текст ерору
         expect(createCarResponse.data, "Response body should be valid").toEqual(
           { status: "error", message: "Car brand id is required" }
         );
@@ -220,7 +200,6 @@ test.describe("Cars", () => {
         const model = models[0];
         const createCarReqBody = {
           carBrandId: brand.id,
-          //carModelId: model.id,
           mileage: Math.floor(Math.random() * 100),
         };
         const createCarResponse = await axios.post(
@@ -230,7 +209,6 @@ test.describe("Cars", () => {
         expect(createCarReqBody.status, "Status code should be valid").toBe(
           400
         );
-        //console.log(createCarResponse.data);// - тут отримаємо очікуваний текст ерору
         expect(createCarResponse.data, "Response body should be valid").toEqual(
           { status: "error", message: "Car model id is required" }
         );
@@ -253,7 +231,6 @@ test.describe("Cars", () => {
       let brands;
       test.beforeAll(async () => {
         await client.post("/auth/signin", {
-          // куки, які викликаються тут - збурежуться в джар об'єкт
           email: USERS.POP.email,
           password: USERS.POP.password,
           remember: false,
@@ -272,7 +249,6 @@ test.describe("Cars", () => {
           expect(createCarReqBody.status, "Status code should be valid").toBe(
             expectedData
           );
-          //console.log(createCarResponse.data);// - тут отримаємо очікуваний текст ерору
           expect(
             createCarResponse.data,
             "Response body should be valid"
