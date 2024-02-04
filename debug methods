@@ -1,0 +1,21 @@
+можна дебажити через метод
+await page.pause() додавши його перед потрібним await 
+
+приклад:
+test("name field is empty", async () => {
+    const registrationPopup = await welcomePage.clickSignUpBtn();
+
+    await registrationPopup.name.fill("I");
+    await registrationPopup.name.clear();
+    await page.pause() // - падає наступний тест, тому ставимо цей метод перед ним
+    await registrationPopup.lName.fill("Popodopulous");
+    await registrationPopup.email.fill("aqa-nbm@test.com");
+    await registrationPopup.psword.fill("Bbbbbbb7");
+    await registrationPopup.rePass.fill("Bbbbbbb7");
+    await expect(registrationPopup.registerBtn).toBeDisabled();
+    await expect(registrationPopup.error).toHaveText("Name required");
+  });
+
+  паузу можна ставити не одну
+працює лише разом з графічним інтерфейсом
+не залишати їх після дебагінгу
